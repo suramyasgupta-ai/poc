@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .App {
+        @apply font-openSans text-white;
+        background: linear-gradient(to bottom right, #2D132C, #EE4540);
+    }
+}
+
+@layer components {
+    .submit-button {
+        background-color: white;
+        color: darkslategray;
+    }
+    .submit-button-valid {
+        background-color: white;
+        color: darkslategray;
+    }
+    .submit-button-valid:hover {
+        @apply bg-accent text-white;
+    }
+    .submit-button-valid:focus {
+        @apply bg-accent text-white;
+    }
+}

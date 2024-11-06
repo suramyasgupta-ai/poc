@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  web:
+    build: ./frontend
+    ports:
+      - "${VITE_WEB_PORT}:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_WEB_PORT=${VITE_WEB_PORT}
+    depends_on:
+      - api
+  
+  api:
+    build: ./backend
+    ports:
+      - "${API_PORT}:8080"
+    volumes:
+      - ./backend/server.js:/server/server.js
+      - ./backend/controllers:/server/controllers
+      - ./backend/routes:/server/routes
+    environment:
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - DATABASE_URI=${DATABASE_URI}
+      - PORT=${API_PORT}
+      - WEB_URL=${WEB_URL}
