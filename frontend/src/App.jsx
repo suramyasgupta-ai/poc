@@ -12,15 +12,16 @@ function App() {
     <Routes>
       <Route path='/' element={<Layout />}>
         {/* Public Routes */}
+        <Route path='/' element={<Home />} />
         <Route path='register' element={<Register />} />
         <Route path='login' element={<Login />} />
 
         {/* Private Routes */}
-        <Route element={<PersistLogin />} >
+        {/* <Route element={<PersistLogin />} >
           <Route element={<RequireAuth />}>
               <Route path='/' element={<Home />} />
           </Route>
-        </Route>
+        </Route> */}
 
         {/* 404 */}
         <Route path='*' element={<h1>404 Not Found</h1>} />
