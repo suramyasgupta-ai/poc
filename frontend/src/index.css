@@ -4,8 +4,7 @@
 
 @layer base {
     .App {
-        @apply font-openSans text-white;
-        background: linear-gradient(to bottom right, #2D132C, #EE4540);
+        @apply font-openSans;
     }
 }
 
@@ -23,5 +22,63 @@
     }
     .submit-button-valid:focus {
         @apply bg-accent text-white;
+    }
+}
+
+@layer utilities {
+    @keyframes slideInFromBottom {
+        0% {
+            height: 6%;
+        }
+        100% {
+            height: 33%;
+        }
+    }
+
+    @keyframes slideInFromBottom2 {
+        0% {
+            height: 0%;
+            opacity: 0;
+        }
+        100% {
+            height: 66%;
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOutToBottom {
+        0% {
+            height: 33%; 
+        }
+        100% {
+            height: 6%; 
+        }
+    }
+
+    @keyframes slideOutToBottom2 {
+        0% {
+            height: 66%; 
+            opacity: 1;
+        }
+        100% {
+            height: 0%; 
+            opacity: 0;
+        }
+    }
+    
+    .slide-in {
+        animation: slideInFromBottom 0.7s ease-out forwards;
+    }
+
+    .slide-in2 {
+        animation: slideInFromBottom2 0.7s ease-out forwards;
+    }
+
+    .slide-out {
+        animation: slideOutToBottom 0.7s ease-in forwards;
+    }
+
+    .slide-out2 {
+        animation: slideOutToBottom2 0.7s ease-in forwards;
     }
 }

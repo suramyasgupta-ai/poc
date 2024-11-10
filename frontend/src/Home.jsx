@@ -1,31 +1,42 @@
-import { useState, useEffect } from 'react';
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import { useState } from 'react';
+import Map from './components/home/Map';
+import Rides from './components/home/Rides';
 
 const Home = () => {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [activeChat, setActiveChat] = useState(null);
+    const [route, setRoute] = useState({});
+    const [routeSearched, setRouteSearched] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
 
-    const toggleSidebar = () => {
-        setSidebarOpen(prev => !prev);
+    const displayRides = (newRoute) => {
+        setRoute(newRoute);
+        setRouteSearched(true);
+        setIsVisible(true);
     };
 
-    useEffect(() => {
-        console.log(activeChat);
-    }, [activeChat]);
+    const hideRides = () => {
+        setIsVisible(false);
+        setTimeout(() => {
+            setRouteSearched(false);
+        }, 700);
+    };
+
+    const toggleVisibility = () => {
+        setIsVisible(prev => !prev);
+    };
 
     return (
-        <section className='flex items-center justify-center h-screen'>
-            <div className='flex flex-col w-full h-full bg-black bg-opacity-40'>
-                <Header sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}/>
-                <div className='flex w-full h-full'>
-                    {sidebarOpen ? 
-                        <Sidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} setActiveChat={setActiveChat}/> 
-                        : 
-                        <h1>Sidebar Closed</h1>
-                    }
-                </div>
-            </div>
+        <section className='relative h-screen'>
+            <Map 
+                displayRides={displayRides} 
+                hideRides={hideRides}
+            />
+            {routeSearched && (
+                <Rides 
+                    route={route}
+                    isVisible={isVisible}
+                    toggleVisibility={toggleVisibility}
+                />
+            )}
         </section>
     )
 };
