@@ -28,7 +28,7 @@
 @layer utilities {
     @keyframes slideInFromBottom {
         0% {
-            height: 6%;
+            height: 35px;
         }
         100% {
             height: 33%;
@@ -37,12 +37,10 @@
 
     @keyframes slideInFromBottom2 {
         0% {
-            height: 0%;
-            opacity: 0;
+            height: 35px;
         }
         100% {
             height: 66%;
-            opacity: 1;
         }
     }
 
@@ -51,18 +49,16 @@
             height: 33%; 
         }
         100% {
-            height: 6%; 
+            height: 35px; 
         }
     }
 
     @keyframes slideOutToBottom2 {
         0% {
             height: 66%; 
-            opacity: 1;
         }
         100% {
-            height: 0%; 
-            opacity: 0;
+            height: 35px; 
         }
     }
     

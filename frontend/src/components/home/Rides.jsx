@@ -40,12 +40,12 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
 
     return (
         <>
-            {smallScreen ? (
+            {smallScreen && (
                 <div
                     className={`absolute bottom-0 w-full bg-base p-1 z-10 ${isVisible ? 'slide-in' : 'slide-out'}`}
                 >
-                    <div
-                        className='w-full flex justify-center cursor-pointer'
+                    <button
+                        className='flex justify-center w-full p-1'
                         onClick={toggleVisibility}
                     >
                         {isVisible ? (
@@ -63,7 +63,7 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
                                 color='white'
                             />
                         }
-                    </div>
+                    </button>
                     {isDropdownVisible && (
                         <div className='max-h-[calc(100%-24px)] overflow-y-auto px-2 mt-1'>
                             <div className='flex items-center'>
@@ -91,36 +91,57 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
                         </div>
                     )}
                 </div>
-            ) : (
-                    <div className={`absolute bottom-0 ml-3 w-80 h-2/3 overflow-y-auto ${isVisible ? 'slide-in2' : 'slide-out2'}`}>
-                        <div className='flex items-center bg-base p-2 rounded-full'>
-                            <img src='/default_profile_picture.png' className='w-16 h-16 object-cover' />
-                            <div className='ml-4 w-1/2 text-white'>
-                                <h2 className='text-sm truncate'><span className='font-bold'>Jeremy</span> (driver)</h2>
-                                <p className='text-xs truncate'>Origin: Boulder, CO</p>
-                                <p className='text-xs truncate'>Destination: Boulder, CO</p>
-                            </div>
-                            <button
-                                className='text-sm mx-auto py-1 px-4 rounded-3xl bg-green-500 hover:scale-95'
-                                onClick={() => console.log("Join trip")}
-                            >
-                                Join
-                            </button>
+            )}
+            {!smallScreen && (
+                <div className={`absolute bottom-0 ml-3 w-80 h-2/3 ${isVisible ? 'slide-in2 overflow-y-auto' : 'slide-out2 overflow-hidden'}`}>
+                    <button
+                        className='flex justify-center w-full p-1 mb-5'
+                        onClick={toggleVisibility}
+                    >
+                        {isVisible ? (
+                            <FontAwesomeIcon
+                                icon={faAnglesDown}
+                                size='xl'
+                                color='white'
+                            />
+
+                        )
+                            :
+                            <FontAwesomeIcon
+                                icon={faAnglesUp}
+                                size='xl'
+                                color='white'
+                            />
+                        }
+                    </button>
+                    <div className='flex items-center bg-base p-2 rounded-full'>
+                        <img src='/default_profile_picture.png' className='w-16 h-16 object-cover' />
+                        <div className='ml-4 w-1/2 text-white'>
+                            <h2 className='text-sm truncate'><span className='font-bold'>Jeremy</span> (driver)</h2>
+                            <p className='text-xs truncate'>Origin: Boulder, CO</p>
+                            <p className='text-xs truncate'>Destination: Boulder, CO</p>
                         </div>
-                        <div className='flex w-full justify-center mt-8'>
-                            <button
-                                className='text-sm py-1 px-4 rounded-3xl bg-white hover:scale-95'
-                                onClick={() => setCreateTripOpen(true)}
-                            >
-                                Create Trip
-                            </button>
-                        </div>
+                        <button
+                            className='text-sm mx-auto py-1 px-4 rounded-3xl bg-green-500 hover:scale-95'
+                            onClick={() => console.log("Join trip")}
+                        >
+                            Join
+                        </button>
                     </div>
-                )}
+                    <div className='flex w-full justify-center mt-8'>
+                        <button
+                            className='text-sm py-1 px-4 rounded-3xl bg-white hover:scale-95'
+                            onClick={() => setCreateTripOpen(true)}
+                        >
+                            Create Trip
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {createTripOpen && (
-                <CreateTrip 
-                    route={route} 
+                <CreateTrip
+                    route={route}
                     setCreateTripOpenFalse={() => setCreateTripOpen(false)}
                 />
             )}
