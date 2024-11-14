@@ -10,7 +10,7 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
     const [validAvailableSeats, setValidAvailableSeats] = useState(true);
 
     const [errMsg, setErrMsg] = useState('');
-    const [err, setErr] = useState(true);
+    const [err, setErr] = useState(false);
 
     const [success, setSuccess] = useState(false);
 
@@ -59,7 +59,7 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
 
     return (
         <div
-            className='absolute flex justify-center items-center w-full h-screen top-0 z-20 backdrop-blur-sm'
+            className='absolute flex justify-center items-center w-full h-[calc(100vh-48px)] top-0 z-20 backdrop-blur-sm'
             onClick={() => { setCreateTripOpenFalse(); setSuccess(false) }}
         >
             <form
@@ -69,7 +69,7 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
             >
                 <button
                     type='button'
-                    className='ml-auto'
+                    className='ml-auto p-2 hover:bg-gray-700 rounded-md'
                     onClick={() => { setCreateTripOpenFalse(); setSuccess(false) }}
                 >
                     <FontAwesomeIcon
@@ -91,9 +91,9 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
                                 </p>
                             )}
 
-                            <label htmlFor='origin' className='hover:cursor-not-allowed'>Origin:</label>
+                            <label htmlFor='origin' className='font-bold text-gray-400 hover:cursor-not-allowed'>Origin:</label>
                             <input
-                                className='p-2 mb-2 rounded-md text-black hover:cursor-not-allowed'
+                                className='p-2 mb-3 rounded-md text-black hover:cursor-not-allowed'
                                 type='text'
                                 id='origin'
                                 name='origin'
@@ -102,9 +102,9 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
                                 disabled
                             />
 
-                            <label htmlFor='destination' className='hover:cursor-not-allowed'>Destination:</label>
+                            <label htmlFor='destination' className='font-bold text-gray-400 hover:cursor-not-allowed'>Destination:</label>
                             <input
-                                className='p-2 mb-2 rounded-md text-black hover:cursor-not-allowed'
+                                className='p-2 mb-3 rounded-md text-black hover:cursor-not-allowed'
                                 type='text'
                                 id='destination'
                                 name='destination'
@@ -113,9 +113,9 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
                                 disabled
                             />
 
-                            <label htmlFor='departureDate'>Departure Date:</label>
+                            <label htmlFor='departureDate' className='font-bold text-gray-400 '>Departure Date:</label>
                             <input
-                                className='p-2 mb-2 rounded-md text-black'
+                                className='p-2 mb-3 rounded-md text-black'
                                 type='date'
                                 id='departureDate'
                                 name='departureDate'
@@ -130,9 +130,9 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
                                 </p>
                             )}
 
-                            <label htmlFor='seatsAvailable'>Seats Available:</label>
+                            <label htmlFor='seatsAvailable' className='font-bold text-gray-400 '>Seats Available:</label>
                             <input
-                                className='p-2 mb-2 rounded-md text-black'
+                                className='p-2 mb-3 rounded-md text-black'
                                 type='number'
                                 min={1}
                                 id='seatsAvailable'
@@ -158,7 +158,7 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
                     )}
             </form>
         </div>
-    )
+    );
 };
 
 export default CreateTrip;

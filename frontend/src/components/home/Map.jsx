@@ -10,7 +10,7 @@ import '../../mapbox/directionsStyle.css'
 const INITIAL_CENTER = [
     -105.2705,
     40.0150
-  ];
+];
 const INITIAL_ZOOM = 10.12;
 
 const Map = ({ displayRides, hideRides }) => {
@@ -22,7 +22,7 @@ const Map = ({ displayRides, hideRides }) => {
     const [zoom, setZoom] = useState(INITIAL_ZOOM);
 
     useEffect(() => {
-        mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+        mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: 'mapbox://styles/mapbox/navigation-night-v1',
