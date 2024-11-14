@@ -1,2 +1,2 @@
-1. Add a toggleVisibility button for rides on larger screen. (If you toggleVisibility=false on small window, then make the window large, rides is perma hidden)
 2. Create and join trip buttons should link to login page if not already logged in
+3. Issue with running miniturized code without NODE_ENV=production. Problem with mapbox-gl-directions.

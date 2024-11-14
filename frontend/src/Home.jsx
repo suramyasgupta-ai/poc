@@ -25,7 +25,7 @@ const Home = () => {
     };
 
     return (
-        <section className='relative h-screen'>
+        <section className='relative h-[calc(100vh-48px)]'>
             <Map 
                 displayRides={displayRides} 
                 hideRides={hideRides}
