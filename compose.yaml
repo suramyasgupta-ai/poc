@@ -10,13 +10,8 @@ services:
       - ./backend/server.js:/app/backend/server.js
     ports:
       - "${API_PORT}:8080"
-    environment:
-      - NODE_ENV=development
-      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
-      - DATABASE_URI=${DATABASE_URI}
-      - PORT=${API_PORT}
-      - WEB_URL=${WEB_URL}
+    env_file:
+      - ./backend/.env.development
 
   frontend-dev:
     build: 
@@ -27,12 +22,9 @@ services:
       - ./frontend/public/:/app/frontend/public/
       - ./frontend/tailwind.config.js:/app/frontend/tailwind.config.js
     ports:
-      - "${VITE_WEB_PORT}:5173"
-    environment:
-      - NODE_ENV=development
-      - VITE_API_URL=${VITE_API_URL}
-      - VITE_WEB_PORT=${VITE_WEB_PORT}
-      - VITE_MAPBOX_ACCESS_TOKEN=${VITE_MAPBOX_ACCESS_TOKEN}
+      - "${WEB_PORT}:5173"
+    env_file:
+      - ./frontend/.env.development
     depends_on:
       - backend-dev
     
@@ -42,24 +34,16 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "${API_PORT}:8080"
-    environment:
-      - NODE_ENV=production
-      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
-      - DATABASE_URI=${DATABASE_URI}
-      - PORT=${API_PORT}
-      - WEB_URL=${WEB_URL}
+    env_file:
+      - ./backend/.env.production
   
   frontend-prod:
     build: 
       context: ./frontend
       dockerfile: Dockerfile.prod
     ports:
-      - "${VITE_WEB_PORT}:80"
-    environment:
-      - NODE_ENV=production
-      - VITE_API_URL=${VITE_API_URL}
-      - VITE_WEB_PORT=${VITE_WEB_PORT}
-      - VITE_MAPBOX_ACCESS_TOKEN=${VITE_MAPBOX_ACCESS_TOKEN}
+      - "${WEB_PORT}:80"
+    env_file:
+      - ./frontend/.env.production
     depends_on:
       - backend-prod
