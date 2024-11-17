@@ -49,6 +49,15 @@
         }
     }
 
+    @keyframes slideInFromRight {
+        0% {
+            width: 8px;
+        }
+        100% {
+            width: 100%;
+        }
+    }
+
     @keyframes slideOutToBottom {
         0% {
             height: 33%; 
@@ -66,6 +75,15 @@
             height: 35px; 
         }
     }
+
+    @keyframes slideOutToRight {
+        0% {
+            width: 100%; 
+        }
+        100% {
+            width: 8px; 
+        }
+    }
     
     .slide-in {
         animation: slideInFromBottom 0.7s ease-out forwards;
@@ -75,11 +93,19 @@
         animation: slideInFromBottom2 0.7s ease-out forwards;
     }
 
+    .slide-in3 {
+        animation: slideInFromRight 0.7s ease-out forwards;
+    }
+
     .slide-out {
         animation: slideOutToBottom 0.7s ease-in forwards;
     }
 
     .slide-out2 {
         animation: slideOutToBottom2 0.7s ease-in forwards;
+    }
+
+    .slide-out3 {
+        animation: slideOutToRight 0.7s ease-in forwards;
     }
 }

@@ -80,15 +80,15 @@ const Register = () => {
     };
 
     return (
-        <section className='flex flex-col items-center justify-center h-screen'>
-            <form onSubmit={handleSubmit} className='flex flex-col w-full max-w-sm p-5 rounded-md bg-black bg-opacity-40'>
+        <section className='flex flex-col items-center justify-center h-[calc(100vh-48px)] bg-[url(login_img.jpg)] xl:bg-[url(xl_login_img.jpg)] bg-cover bg-center'>
+            <form onSubmit={handleSubmit} className='flex flex-col w-full max-w-sm p-5 rounded-md bg-black bg-opacity-40 text-white'>
                 {err && (
-                    <p className='text-lg bg-accent rounded-md p-3 mb-5'>
+                    <p className='bg-red-500 rounded-md p-3 mb-5'>
                         {errMsg}
                     </p>
                 )}
 
-                <h1 className="text-3xl font-bold mb-5">Register</h1>
+                <h1 className="text-3xl font-bold mb-5">Sign Up</h1>
 
                 <label htmlFor='username' className='text-lg mb-1'>
                     Username:
@@ -102,7 +102,7 @@ const Register = () => {
                     )}
                 </label>
                 <input
-                    className='p-2 mb-1 rounded-md text-black'
+                    className='p-2 mb-1 border-2 border-black rounded-xl bg-transparent'
                     type='text'
                     id='username'
                     autoComplete="off"
@@ -134,7 +134,7 @@ const Register = () => {
                     )}
                 </label>
                 <input
-                    className='p-2 mb-1 rounded-md text-black'
+                    className='p-2 mb-1 border-2 border-black rounded-xl bg-transparent'
                     type='password'
                     id='password'
                     value={password}
@@ -165,7 +165,7 @@ const Register = () => {
                     )}
                 </label>
                 <input
-                    className='p-2 mb-1 rounded-md text-black'
+                    className='p-2 mb-1 border-2 border-black rounded-xl bg-transparent'
                     type='password'
                     id='confirm-password'
                     value={confirmPass}
@@ -182,10 +182,15 @@ const Register = () => {
                 )}
 
 
-                <button className={!validName || !validPass || !validConfirmPass ? 'submit-button p-2 mt-3 rounded-md text-lg' : 'submit-button-valid p-2 mt-3 rounded-md text-lg'} disabled={!validName || !validPass || !validConfirmPass ? true : false}>Register</button>
+                <button 
+                    className={`px-2 mt-2 w-fit mx-auto rounded-md text-lg ${validName && validPass && validConfirmPass && 'underline'}`} 
+                    disabled={!validName || !validPass || !validConfirmPass ? true : false}
+                >
+                    Sign Up
+                </button>
                 <p className='text-lg mt-3'>
                     Already registered? <br />
-                    <Link to='/login' className='underline'>Log In</Link>
+                    <Link to='/login' className='underline'>Sign In</Link>
                 </p>
             </form>
         </section>
