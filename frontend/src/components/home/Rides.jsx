@@ -2,24 +2,26 @@ import { useState, useEffect } from 'react';
 import { faAnglesDown, faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CreateTrip from './CreateTrip';
-import JoinTrip from './JoinTrip';
+import TripInfo from './TripInfo';
 
 const trips = [
     {
         driver: "Jeremy Schur",
         origin: "Boulder, Colorado, United States",
         destination: "Boulder, Colorado, United States",
-        passengers: ["Brittany Schur", "Larry Schur"]
+        passengers: ["Brittany Schur", "Larry Schur"],
+        requests: ["Hailey Smith", "Dawn Deere"]
     },
     {
         driver: "Jeremy Schur",
         origin: "San Antonio, Texas, United States",
         destination: "Boulder, Colorado, United States",
-        passengers: ["John Doe", "Jane Doe", "Brittany Schur", "Larry Schur", "John Doe", "Jane Doe", "Brittany Schur", "Larry Schur"]
+        passengers: ["John Doe", "Jane Doe", "Brittany Schur", "Larry Schur", "John Doe", "Jane Doe", "Brittany Schur", "Larry Schur"],
+        requests: ["Joseph Smith", "John Deere"]
     },
 ]
 
-const Rides = ({ route, isVisible, toggleVisibility }) => {
+const Rides = ({ route, isRidesVisible, toggleRides }) => {
     const [smallScreen, setSmallScreen] = useState(false);
 
     const [createTripOpen, setCreateTripOpen] = useState(false);
@@ -41,7 +43,7 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
     }, []);
 
     useEffect(() => {
-        toggleVisibility();
+        toggleRides();
     }, [createTripOpen, joinTripOpen]);
 
     const handleDisplayJoin = (trip) => {
@@ -54,8 +56,16 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
         setJoinTripOpen(false);
     };
 
+    const filteredTrips = trips.filter((trip) => {
+        const origin = route.origin.toLowerCase();
+        const destination = route.destination.toLowerCase();
+        return (
+            trip.origin.toLowerCase().includes(origin) ||
+            trip.destination.toLowerCase().includes(destination)
+        );
+    });
 
-    const tripElements = trips.map((trip, index) => (
+    const tripElements = filteredTrips.map((trip, index) => (
         <div key={index} className={`flex items-center mb-2 ${!smallScreen && 'bg-base p-2 rounded-full'}`}>
             <img src='/default_profile_picture.png' className={`w-16 h-16 object-cover ${smallScreen && 'ml-4'}`} />
             <div className='ml-4 w-1/2 text-white'>
@@ -76,13 +86,13 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
         <>
             {smallScreen && (
                 <div
-                    className={`absolute bottom-0 w-full h-1/3 bg-base p-1 pb-4 z-10 overflow-y-hidden ${isVisible ? 'slide-in' : 'slide-out'}`}
+                    className={`absolute bottom-0 w-full h-1/3 bg-base p-1 pb-4 z-10 overflow-y-hidden ${isRidesVisible ? 'slide-in' : 'slide-out'}`}
                 >
                     <button
                         className='flex justify-center w-full p-1 mb-2'
-                        onClick={toggleVisibility}
+                        onClick={toggleRides}
                     >
-                        {isVisible ? (
+                        {isRidesVisible ? (
                             <FontAwesomeIcon
                                 icon={faAnglesDown}
                                 size='xl'
@@ -112,12 +122,12 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
                 </div>
             )}
             {!smallScreen && (
-                <div className={`absolute bottom-0 ml-3 w-80 h-2/3 z-10 ${isVisible ? 'slide-in2' : 'slide-out2'}`}>
+                <div className={`absolute bottom-0 ml-3 w-80 h-2/3 z-10 ${isRidesVisible ? 'slide-in2' : 'slide-out2'}`}>
                     <button
                         className='flex justify-center w-full p-1 mb-3'
-                        onClick={toggleVisibility}
+                        onClick={toggleRides}
                     >
-                        {isVisible ? (
+                        {isRidesVisible ? (
                             <FontAwesomeIcon
                                 icon={faAnglesDown}
                                 size='xl'
@@ -155,10 +165,16 @@ const Rides = ({ route, isVisible, toggleVisibility }) => {
             )}
 
             {joinTripOpen && (
-                <JoinTrip
+                <TripInfo
                     openTrip={openTrip}
                     handleCloseDisplayJoin={handleCloseDisplayJoin}
-                />
+                >
+                    <button
+                        className='text-sm py-1 px-4 rounded-3xl bg-green-500 hover:scale-95'
+                    >
+                        Request to Join
+                    </button>
+                </TripInfo>
             )}
         </>
     );

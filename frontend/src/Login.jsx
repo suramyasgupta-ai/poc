@@ -62,10 +62,10 @@ const Login = () => {
     };
 
     return (
-        <section className='flex flex-col items-center justify-center h-screen'>
-            <form onSubmit={handleSubmit} className='flex flex-col w-full max-w-sm p-5 rounded-md bg-black bg-opacity-40'>
+        <section className='flex flex-col items-center justify-center h-[calc(100vh-48px)] bg-[url(login_img.jpg)] xl:bg-[url(xl_login_img.jpg)] bg-cover bg-center'>
+            <form onSubmit={handleSubmit} className='flex flex-col w-full max-w-sm p-5 rounded-md bg-black bg-opacity-40 text-white'>
                 {err && (
-                    <p className='text-lg bg-accent rounded-md p-3 mb-5'>
+                    <p className='bg-red-500 rounded-md p-3 mb-5'>
                         {errMsg}
                     </p>
                 )}
@@ -76,7 +76,7 @@ const Login = () => {
                     Username:
                 </label>
                 <input
-                    className='p-2 mb-1 rounded-md text-black'
+                    className='p-2 mb-1 border-2 border-black rounded-xl bg-transparent'
                     type='text'
                     id='username'
                     autoComplete="off"
@@ -90,7 +90,7 @@ const Login = () => {
                     Password:
                 </label>
                 <input
-                    className='p-2 mb-1 rounded-md text-black'
+                    className='p-2 mb-1 border-2 border-black rounded-xl bg-transparent'
                     type='password'
                     id='password'
                     value={password}
@@ -99,10 +99,10 @@ const Login = () => {
                 />
 
 
-                <button className='submit-button-valid p-2 mt-3 rounded-md text-lg'>Log In</button>
+                <button className='px-2 mt-2 w-fit mx-auto rounded-md text-lg underline'>Sign In</button>
                 <p className='text-lg mt-3'>
                     Need an Account? <br />
-                    <Link to='/register' className='underline'>Register</Link>
+                    <Link to='/register' className='underline'>Sign Up</Link>
                 </p>
             </form>
         </section>

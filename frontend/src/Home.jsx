@@ -1,27 +1,55 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Map from './components/home/Map';
+import Sidebar from './components/home/Sidebar';
 import Rides from './components/home/Rides';
 
 const Home = () => {
     const [route, setRoute] = useState({});
     const [routeSearched, setRouteSearched] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
+    const [isRidesVisible, setIsRidesVisible] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    useEffect(() => {
+        const closeAll = () => {
+            if (window.innerWidth < 768) {
+                setSidebarOpen(false);
+                setIsRidesVisible(false);
+            }
+        };
+
+        window.addEventListener('resize', closeAll);
+
+        return () => {
+            window.removeEventListener('resize', closeAll);
+        };
+    }, []);
 
     const displayRides = (newRoute) => {
         setRoute(newRoute);
         setRouteSearched(true);
-        setIsVisible(true);
+        setIsRidesVisible(true);
+        setSidebarOpen(false);
     };
 
     const hideRides = () => {
-        setIsVisible(false);
+        setIsRidesVisible(false);
         setTimeout(() => {
             setRouteSearched(false);
         }, 700);
     };
 
-    const toggleVisibility = () => {
-        setIsVisible(prev => !prev);
+    const toggleRides = () => {
+        if (window.innerWidth < 768 && sidebarOpen) {
+            toggleSidebar();
+        }
+        setIsRidesVisible(prev => !prev);
+    };
+
+    const toggleSidebar = () => {
+        if (window.innerWidth < 768 && isRidesVisible) {
+            toggleRides();
+        }
+        setSidebarOpen(prev => !prev);
     };
 
     return (
@@ -30,11 +58,15 @@ const Home = () => {
                 displayRides={displayRides} 
                 hideRides={hideRides}
             />
+            <Sidebar 
+                sidebarOpen={sidebarOpen}
+                toggleSidebar={toggleSidebar}
+            />
             {routeSearched && (
                 <Rides 
                     route={route}
-                    isVisible={isVisible}
-                    toggleVisibility={toggleVisibility}
+                    isRidesVisible={isRidesVisible}
+                    toggleRides={toggleRides}
                 />
             )}
         </section>
