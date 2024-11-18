@@ -1,33 +1,38 @@
 import { useState, useEffect } from 'react';
 import { faAnglesDown, faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from '../../api/axios';
 import CreateTrip from './CreateTrip';
 import TripInfo from './TripInfo';
 
-const trips = [
-    {
-        driver: "Jeremy Schur",
-        origin: "Boulder, Colorado, United States",
-        destination: "Boulder, Colorado, United States",
-        passengers: ["Brittany Schur", "Larry Schur"],
-        requests: ["Hailey Smith", "Dawn Deere"]
-    },
-    {
-        driver: "Jeremy Schur",
-        origin: "San Antonio, Texas, United States",
-        destination: "Boulder, Colorado, United States",
-        passengers: ["John Doe", "Jane Doe", "Brittany Schur", "Larry Schur", "John Doe", "Jane Doe", "Brittany Schur", "Larry Schur"],
-        requests: ["Joseph Smith", "John Deere"]
-    },
-]
-
 const Rides = ({ route, isRidesVisible, toggleRides }) => {
+    const [trips, setTrips] = useState([]);
+
     const [smallScreen, setSmallScreen] = useState(false);
 
     const [createTripOpen, setCreateTripOpen] = useState(false);
-
     const [joinTripOpen, setJoinTripOpen] = useState(false);
     const [openTrip, setOpenTrip] = useState({});
+
+    useEffect(() => {
+        const fetchRoutes = async () => {
+            try {
+                const response = await axios.get('/api/routes', {
+                    params: {
+                        origin: route.origin,
+                        destination: route.destination
+                    }
+                });
+                const routes = response.data;
+                setTrips(routes);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchRoutes();
+    }, [route]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -54,6 +59,10 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
     const handleCloseDisplayJoin = () => {
         setOpenTrip({});
         setJoinTripOpen(false);
+    };
+
+    const updateTrips = (trip) => {
+        setTrips((prev) => [...prev, trip]);
     };
 
     const filteredTrips = trips.filter((trip) => {
@@ -161,6 +170,7 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
                 <CreateTrip
                     route={route}
                     setCreateTripOpenFalse={() => setCreateTripOpen(false)}
+                    updateTrips={updateTrips}
                 />
             )}
 
@@ -171,6 +181,7 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
                 >
                     <button
                         className='text-sm py-1 px-4 rounded-3xl bg-green-500 hover:scale-95'
+                        onClick={(e) => e.stopPropagation()}
                     >
                         Request to Join
                     </button>
