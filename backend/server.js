@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser');
 const credentials = require('./middleware/credentials');
 const mongoose = require('mongoose');
 const connectDB = require('./config/dbConn');
-const PORT = process.env.PORT;
+const PORT = process.env.API_PORT;
 
 // Connect to the database
 connectDB();
@@ -34,10 +34,14 @@ app.use('/auth/login', require('./routes/auth/login'));
 app.use('/auth/refresh', require('./routes/auth/refresh'));
 app.use('/auth/logout', require('./routes/auth/logout'));
 
-// Verify JWT for all routes below this line
+// Public Routes
+app.use('/api/routes', require('./routes/api/routes'));
+
+// Verify JWT for all routes below this line (private routes)
 app.use(verifyJWT);
 
 app.use('/api/users', require('./routes/api/users'));
+app.use('/api/trips', require('./routes/api/trips'));
 
 // Error handling middleware
 app.use(errorHandler);
