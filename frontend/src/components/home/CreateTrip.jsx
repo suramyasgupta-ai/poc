@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { faXmark, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import useAuth from '../../hooks/useAuth';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
+const CreateTrip = ({ route, setCreateTripOpenFalse, updateTrips }) => {
     const [departureDate, setDepartureDate] = useState(new Date().toISOString().split('T')[0]);
     const [validDepartureDate, setValidDepartureDate] = useState(true);
 
@@ -13,6 +16,11 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
     const [err, setErr] = useState(false);
 
     const [success, setSuccess] = useState(false);
+
+    const axiosPrivate = useAxiosPrivate();
+    const { auth } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         setErr(false);
@@ -34,27 +42,48 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
         return departure >= today
     };
 
-    const handleCreateTrip = (e) => {
+    const handleCreateTrip = async (e) => {
         e.preventDefault();
 
+        if (!auth?.username) {
+            navigate('/login', { state: { from: location }, replace: true });
+            return;
+        }
         if (!validateDepartureDate()) {
-            setErrMsg('Invalid Departure Date');
+            setErrMsg('Invalid departure date');
             setErr(true);
             return;
         }
         if (availableSeats < 1) {
-            setErrMsg('Invalid Available Seats');
+            setErrMsg('Invalid available seats');
             setErr(true);
             return;
         }
 
-        console.log({
-            ...route,
-            departureDate,
-            availableSeats
-        });
-
-        setSuccess(true);
+        try {
+            const driver = auth?.username;
+            const response = await axiosPrivate.post('/api/trips', {
+                driver: driver,
+                ...route,
+                departure_date: departureDate,
+                seats_available: availableSeats
+            });
+            const newTrip = response.data;
+            updateTrips(newTrip);
+            setSuccess(true);
+        }
+        catch (error) {
+            if (!error?.response) {
+                setErrMsg('Network error. No server response.');
+            }
+            else if (error.response?.status === 400) {
+                setErrMsg('Invalid trip.');
+            }
+            else {
+                setErrMsg('Trip creation failed.');
+            }
+            setErr(true);
+        }
     };
 
     return (
@@ -151,6 +180,7 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
                             <button
                                 className={`py-1 px-4 mt-3 w-1/3 rounded-3xl bg-green-500 ${validDepartureDate && validAvailableSeats ? 'hover:scale-95' : 'opacity-50 cursor-not-allowed'}`}
                                 disabled={!validDepartureDate || !validAvailableSeats}
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 Create Trip
                             </button>
