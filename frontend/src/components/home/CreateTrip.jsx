@@ -5,7 +5,7 @@ import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import useAuth from '../../hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const CreateTrip = ({ route, setCreateTripOpenFalse, updateTrips }) => {
+const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
     const [departureDate, setDepartureDate] = useState(new Date().toISOString().split('T')[0]);
     const [validDepartureDate, setValidDepartureDate] = useState(true);
 
@@ -33,11 +33,8 @@ const CreateTrip = ({ route, setCreateTripOpenFalse, updateTrips }) => {
     }, [availableSeats]);
 
     const validateDepartureDate = () => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const departure = new Date(departureDate);
-        departure.setHours(0, 0, 0, 0);
+        const today = new Date().toISOString().split('T')[0];
+        const departure = departureDate.split('T')[0];
 
         return departure >= today
     };
@@ -46,7 +43,7 @@ const CreateTrip = ({ route, setCreateTripOpenFalse, updateTrips }) => {
         e.preventDefault();
 
         if (!auth?.username) {
-            navigate('/login', { state: { from: location }, replace: true });
+            navigate('/login', { state: { from: location } });
             return;
         }
         if (!validateDepartureDate()) {
@@ -62,14 +59,14 @@ const CreateTrip = ({ route, setCreateTripOpenFalse, updateTrips }) => {
 
         try {
             const driver = auth?.username;
+            const departure_date = departureDate.split('T')[0];
             const response = await axiosPrivate.post('/api/trips', {
                 driver: driver,
                 ...route,
-                departure_date: departureDate,
+                departure_date: departure_date,
                 seats_available: availableSeats
             });
             const newTrip = response.data;
-            updateTrips(newTrip);
             setSuccess(true);
         }
         catch (error) {
@@ -78,6 +75,9 @@ const CreateTrip = ({ route, setCreateTripOpenFalse, updateTrips }) => {
             }
             else if (error.response?.status === 400) {
                 setErrMsg('Invalid trip.');
+            }
+            else if (error.response?.status === 409) {
+                setErrMsg('Cannot create two trips on the same day.')
             }
             else {
                 setErrMsg('Trip creation failed.');
@@ -178,7 +178,7 @@ const CreateTrip = ({ route, setCreateTripOpenFalse, updateTrips }) => {
                             )}
 
                             <button
-                                className={`py-1 px-4 mt-3 w-1/3 rounded-3xl bg-green-500 ${validDepartureDate && validAvailableSeats ? 'hover:scale-95' : 'opacity-50 cursor-not-allowed'}`}
+                                className={`text-sm py-1 px-4 mt-3 w-1/3 rounded-3xl bg-green-500 ${validDepartureDate && validAvailableSeats ? 'hover:scale-95' : 'opacity-50 cursor-not-allowed'}`}
                                 disabled={!validDepartureDate || !validAvailableSeats}
                                 onClick={(e) => e.stopPropagation()}
                             >

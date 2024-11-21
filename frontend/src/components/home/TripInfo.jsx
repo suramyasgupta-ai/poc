@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const TripInfo = ({ openTrip, handleCloseDisplayJoin, children }) => {
+const TripInfo = ({ openTrip, handleCloseDisplayJoin, tripInfoErr, tripInfoErrMsg, children }) => {
     const isScrolling = useRef(false);
 
     const handleHorizontalScroll = (e) => {
@@ -18,14 +18,20 @@ const TripInfo = ({ openTrip, handleCloseDisplayJoin, children }) => {
         }
     };
 
-    const passengerElements = openTrip.passengers.map((passenger, index) => (
-        <button
-            key={index}
-            className='text-sm py-1 px-4 rounded-3xl bg-gray-500 text-nowrap hover:scale-95'
-        >
-            {passenger}
-        </button>
-    ));
+    const passengerElements = openTrip?.passengers?.length > 0 ? (
+        openTrip.passengers.map((passenger, index) => (
+            <button
+                key={index}
+                className="text-sm py-1 px-4 rounded-3xl bg-gray-500 text-nowrap hover:scale-95"
+            >
+                {passenger}
+            </button>
+        ))
+    ) : (
+        <div className="text-white text-center">
+            No Passengers
+        </div>
+    );
 
     return (
         <div
@@ -36,6 +42,11 @@ const TripInfo = ({ openTrip, handleCloseDisplayJoin, children }) => {
                 className='flex flex-col w-full max-w-sm p-5 rounded-md bg-base text-gray-200 shadow-lg'
                 onClick={(e) => e.stopPropagation()}
             >
+                {tripInfoErr && (
+                    <p className='bg-red-500 rounded-md p-3 mb-2 mt-1'>
+                        {tripInfoErrMsg}
+                    </p>
+                )}
                 <div className='flex items-center border-b border-gray-500 pb-3'>
                     <img src='/default_profile_picture.png' className='w-14 h-14 object-cover' />
                     <h1 className='text-lg text-white ml-2'>
@@ -62,6 +73,10 @@ const TripInfo = ({ openTrip, handleCloseDisplayJoin, children }) => {
                     <div>
                         <h2 className='font-bold text-gray-400'>Destination:</h2>
                         <p className='text-white'>{openTrip.destination}</p>
+                    </div>
+                    <div>
+                        <h2 className='font-bold text-gray-400'>Departure Date:</h2>
+                        <p className='text-white'>{openTrip.departure_date}</p>
                     </div>
                     <div>
                         <h2 className='font-bold text-gray-400'>Passengers:</h2>

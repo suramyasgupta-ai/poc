@@ -5,16 +5,27 @@ import JoinedRides from "./JoinedRides";
 import TripInfo from "./TripInfo";
 import { faCheck, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useAuth from "../../hooks/useAuth";
 
 const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
     const isScrolling = useRef(false);
     const [currentSlide, setCurrentSlide] = useState('Created Rides');
     const [searchBar, setSearchBar] = useState('');
 
+    const [createdRides, setCreatedRides] = useState([]);
+    const [joinedRides, setJoinedRides] = useState([]);
+
     const [createdRideViewOpen, setCreatedRideViewOpen] = useState(false);
     const [createdRide, setCreatedRide] = useState({});
     const [joinedRideViewOpen, setJoinedRideViewOpen] = useState(false);
     const [joinedRide, setJoinedRide] = useState({});
+
+    const [tripInfoErr, setTripInfoErr] = useState(false);
+    const [tripInfoErrMsg, setTripInfoErrMsg] = useState('');
+
+    const axiosPrivate = useAxiosPrivate();
+    const { auth } = useAuth();
 
     const handleSlideChange = (slide) => {
         setCurrentSlide(slide);
@@ -30,6 +41,8 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
         toggleSidebar();
         setCreatedRide({});
         setCreatedRideViewOpen(false);
+        setTripInfoErr(false);
+        setTripInfoErrMsg('');
     }
 
     const handleOpenJoinedDisplay = (trip) => {
@@ -42,6 +55,8 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
         toggleSidebar();
         setJoinedRide({});
         setJoinedRideViewOpen(false);
+        setTripInfoErr(false);
+        setTripInfoErrMsg('');
     };
 
     const handleHorizontalScroll = (e) => {
@@ -57,16 +72,53 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
         }
     };
 
-    const requestElements = (createdRide.requests ?
+    const initCreatedRides = (rides) => {
+        setCreatedRides(rides);
+    };
+
+    const initJoinedRides = (rides) => {
+        setJoinedRides(rides);
+    }
+
+    const handleDeleteTrip = async () => {
+        try {
+            const response = await axiosPrivate.delete('/api/trips', {
+                params: {
+                    driver: auth?.username,
+                    departure_date: createdRide.departure_date
+                }
+            });
+            setCreatedRides(prevCreatedRides => 
+                prevCreatedRides.filter(ride => 
+                    ride.driver !== auth?.username || ride.departure_date !== createdRide.departure_date
+                )
+            );
+            handleCloseCreatedDisplay();
+        }
+        catch (error) {
+            if (!error?.response) {
+                setTripInfoErrMsg('Server is down. Please try again later.');
+            }
+            else if (error.response?.status === 404) {
+                setTripInfoErrMsg('Trip not found.');
+            }
+            else {
+                setTripInfoErrMsg('Trip failed to delete.')
+            }
+            setTripInfoErr(true);
+        }
+    };
+
+    const requestElements = createdRide?.requests?.length > 0 ? (
         createdRide.requests.map((passenger, index) => (
-            <div 
+            <div
                 key={index}
                 className='flex'
             >
                 <button
                     className='text-sm p-1 bg-green-500 rounded-l-3xl hover:scale-95'
                 >
-                    <FontAwesomeIcon 
+                    <FontAwesomeIcon
                         className='px-1'
                         icon={faCheck}
                         size='lg'
@@ -82,15 +134,17 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
                 <button
                     className='text-sm p-1 bg-red-500 rounded-r-3xl hover:scale-95'
                 >
-                    <FontAwesomeIcon 
+                    <FontAwesomeIcon
                         className='px-1'
                         icon={faX}
                         size='lg'
                     />
                 </button>
             </div>
-        )) :
-        <h1>No Requests</h1>
+        ))) : (
+        <div className="text-white text-center">
+            No Requests
+        </div>
     );
 
     return (
@@ -112,10 +166,20 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
                             onChange={(e) => setSearchBar(e.target.value)}
                         />
                         {currentSlide === 'Created Rides' && (
-                            <CreatedRides searchBar={searchBar} toggleSidebar={toggleSidebar} handleOpenDisplay={handleOpenCreatedDisplay} />
+                            <CreatedRides 
+                                searchBar={searchBar} 
+                                createdRides={createdRides} 
+                                initCreatedRides={initCreatedRides} 
+                                handleOpenDisplay={handleOpenCreatedDisplay} 
+                            />
                         )}
                         {currentSlide === 'Joined Rides' && (
-                            <JoinedRides searchBar={searchBar} toggleSidebar={toggleSidebar} handleOpenDisplay={handleOpenJoinedDisplay} />
+                            <JoinedRides 
+                                searchBar={searchBar} 
+                                joinedRides={joinedRides}
+                                initJoinedRides={initJoinedRides}
+                                handleOpenDisplay={handleOpenJoinedDisplay} 
+                            />
                         )}
                     </div>
                 </div>
@@ -125,9 +189,12 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
                 <TripInfo
                     openTrip={createdRide}
                     handleCloseDisplayJoin={handleCloseCreatedDisplay}
+                    tripInfoErr={tripInfoErr}
+                    tripInfoErrMsg={tripInfoErrMsg}
                 >
                     <button
                         className='text-sm py-1 px-4 rounded-3xl bg-red-500 hover:scale-95'
+                        onClick={handleDeleteTrip}
                     >
                         Delete
                     </button>
