@@ -99,6 +99,13 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
                 requester: auth?.username
             });
             setOpenTrip(response.data);
+            setTrips(prevTrips => 
+                prevTrips.map(trip => 
+                    trip.driver === openTrip.driver && trip.departure_date === openTrip.departure_date
+                        ? response.data
+                        : trip
+                )
+            );
         }
         catch (error) {
             if (!error?.response) {
