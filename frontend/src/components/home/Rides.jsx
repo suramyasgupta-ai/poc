@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { faAnglesDown, faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from '../../api/axios';
+import { useNavigate, useLocation, replace } from 'react-router-dom';
+import axios, { axiosPrivate } from '../../api/axios';
+import useAuth from '../../hooks/useAuth';
 import CreateTrip from './CreateTrip';
 import TripInfo from './TripInfo';
 
@@ -14,20 +16,27 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
     const [joinTripOpen, setJoinTripOpen] = useState(false);
     const [openTrip, setOpenTrip] = useState({});
 
+    const [tripInfoErrMsg, setTripInfoErrMsg] = useState('');
+    const [tripInfoErr, setTripInfoErr] = useState(false);
+
+    const { auth } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
     useEffect(() => {
         const fetchRoutes = async () => {
             try {
                 const response = await axios.get('/api/routes', {
                     params: {
                         origin: route.origin,
-                        destination: route.destination
+                        destination: route.destination,
                     }
                 });
                 const routes = response.data;
                 setTrips(routes);
             }
             catch (error) {
-                console.log(error);
+                setTrips([]);
             }
         };
 
@@ -52,6 +61,11 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
     }, [createTripOpen, joinTripOpen]);
 
     const handleDisplayJoin = (trip) => {
+        if (!auth?.username) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+
         setOpenTrip(trip);
         setJoinTripOpen(true);
     };
@@ -59,18 +73,57 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
     const handleCloseDisplayJoin = () => {
         setOpenTrip({});
         setJoinTripOpen(false);
+        setTripInfoErr(false);
+        setTripInfoErrMsg('');
     };
 
-    const updateTrips = (trip) => {
-        setTrips((prev) => [...prev, trip]);
+    const handleOpenDisplayCreate = () => {
+        if (!auth?.username) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+
+        setCreateTripOpen(true);
+    };
+
+    const handleTripRequest = async () => {
+        if (!auth?.username) {
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+
+        try {
+            const response = await axiosPrivate.post('/api/trips/requestJoin', {
+                driver: openTrip.driver,
+                departure_date: openTrip.departure_date,
+                requester: auth?.username
+            });
+            setOpenTrip(response.data);
+        }
+        catch (error) {
+            if (!error?.response) {
+                setTripInfoErrMsg('Server is down. Please try again later.');
+            }
+            else if (error.response?.status === 404) {
+                setTripInfoErrMsg('Trip not available.');
+            }
+            else if (error.response?.status === 409) {
+                setTripInfoErrMsg('Already requested or joined.');
+            }
+            else {
+                setTripInfoErrMsg('Request to join failed.')
+            }
+            setTripInfoErr(true);
+        }
     };
 
     const filteredTrips = trips.filter((trip) => {
         const origin = route.origin.toLowerCase();
         const destination = route.destination.toLowerCase();
         return (
-            trip.origin.toLowerCase().includes(origin) ||
-            trip.destination.toLowerCase().includes(destination)
+            trip.driver !== auth?.username &&
+            (trip.origin.toLowerCase().includes(origin) ||
+                trip.destination.toLowerCase().includes(destination))
         );
     });
 
@@ -122,7 +175,7 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
                         <div className='flex w-full justify-center my-6'>
                             <button
                                 className='text-sm py-1 px-4 rounded-3xl bg-white hover:scale-95'
-                                onClick={() => setCreateTripOpen(true)}
+                                onClick={handleOpenDisplayCreate}
                             >
                                 Create Trip
                             </button>
@@ -157,7 +210,7 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
                         <div className='flex w-full justify-center my-6'>
                             <button
                                 className='text-sm py-1 px-4 rounded-3xl bg-white hover:scale-95'
-                                onClick={() => setCreateTripOpen(true)}
+                                onClick={handleOpenDisplayCreate}
                             >
                                 Create Trip
                             </button>
@@ -170,7 +223,6 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
                 <CreateTrip
                     route={route}
                     setCreateTripOpenFalse={() => setCreateTripOpen(false)}
-                    updateTrips={updateTrips}
                 />
             )}
 
@@ -178,10 +230,16 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
                 <TripInfo
                     openTrip={openTrip}
                     handleCloseDisplayJoin={handleCloseDisplayJoin}
+                    tripInfoErr={tripInfoErr}
+                    tripInfoErrMsg={tripInfoErrMsg}
                 >
                     <button
-                        className='text-sm py-1 px-4 rounded-3xl bg-green-500 hover:scale-95'
-                        onClick={(e) => e.stopPropagation()}
+                        className={`text-sm py-1 px-4 rounded-3xl bg-green-500 ${openTrip.requests.includes(auth?.username) || openTrip.passengers.includes(auth?.username)
+                                ? 'cursor-not-allowed opacity-50'
+                                : 'hover:scale-95'
+                            }`}
+                        disabled={openTrip.requests.includes(auth?.username) || openTrip.passengers.includes(auth?.username)}
+                        onClick={handleTripRequest}
                     >
                         Request to Join
                     </button>

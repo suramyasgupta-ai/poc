@@ -15,7 +15,7 @@ const tripSchema = new Schema({
         required: true
     },
     departure_date: {
-        type: Date,
+        type: String,
         required: true
     },
     seats_available: {
