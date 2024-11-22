@@ -109,6 +109,72 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
         }
     };
 
+    const handleAcceptRequest = async (passenger) => {
+        try {
+            const response  = await axiosPrivate.post('/api/trips/acceptRequest', {
+                driver: auth?.username,
+                departure_date: createdRide.departure_date,
+                requester: passenger
+            });
+            const updatedRide = response.data;
+            setCreatedRide(updatedRide);
+            setCreatedRides(prevCreatedRides => 
+                prevCreatedRides.map(ride => 
+                    ride.driver === updatedRide.driver && ride.departure_date === updatedRide.departure_date
+                    ? updatedRide 
+                    : ride
+                )
+            );
+            setTripInfoErrMsg('');
+            setTripInfoErr(false);
+        }
+        catch (error) {
+            if (!error?.response) {
+                setTripInfoErrMsg('Server is down. Please try again later.');
+            }
+            else if (error.response?.status === 404) {
+                setTripInfoErrMsg('Trip or requester not found.');
+            }
+            else {
+                setTripInfoErrMsg('Failed to accept requester.')
+            }
+            setTripInfoErr(true);
+        }
+    };
+
+    const handleRejectRequest = async (passenger) => {
+        try {
+            const response  = await axiosPrivate.post('/api/trips/rejectRequest', {
+                driver: auth?.username,
+                departure_date: createdRide.departure_date,
+                requester: passenger
+            });
+            const updatedRide = response.data;
+            setCreatedRide(updatedRide);
+            setCreatedRides(prevCreatedRides => 
+                prevCreatedRides.map(ride => 
+                    ride.driver === updatedRide.driver && ride.departure_date === updatedRide.departure_date
+                    ? updatedRide 
+                    : ride
+                )
+            );
+            setTripInfoErrMsg('');
+            setTripInfoErr(false);
+        }
+        catch (error) {
+            if (!error?.response) {
+                setTripInfoErrMsg('Server is down. Please try again later.');
+            }
+            else if (error.response?.status === 404) {
+                setTripInfoErrMsg('Trip or requester not found.');
+            }
+            else {
+                setTripInfoErrMsg('Failed to reject requester.')
+            }
+            setTripInfoErr(true);
+        }
+    };
+
     const requestElements = createdRide?.requests?.length > 0 ? (
         createdRide.requests.map((passenger, index) => (
             <div
@@ -117,6 +183,7 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
             >
                 <button
                     className='text-sm p-1 bg-green-500 rounded-l-3xl hover:scale-95'
+                    onClick={() => handleAcceptRequest(passenger)}
                 >
                     <FontAwesomeIcon
                         className='px-1'
@@ -133,6 +200,7 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
 
                 <button
                     className='text-sm p-1 bg-red-500 rounded-r-3xl hover:scale-95'
+                    onClick={() => handleRejectRequest(passenger)}
                 >
                     <FontAwesomeIcon
                         className='px-1'

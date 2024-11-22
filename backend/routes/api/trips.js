@@ -10,5 +10,10 @@ router.route('/')
 router.route('/requestJoin')
     .post(tripsController.requestJoin);
 
+router.route('/acceptRequest')
+    .post(tripsController.acceptRequest);
+
+router.route('/rejectRequest')
+    .post(tripsController.rejectRequest);
 
 module.exports = router;

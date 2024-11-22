@@ -112,11 +112,11 @@ const requestJoin = async (req, res) => {
     const { driver, departure_date, requester } = req.body;
 
     if (!driver || !departure_date || !requester) {
-        return res.status(400).json({message: "Driver, departure date, and the requester are required."});
+        return res.status(400).json({ message: "Driver, departure date, and the requester are required." });
     }
 
     if (requester != req.username) {
-        return res.status(401).json({message: "Cannot join trip as another user."});
+        return res.status(401).json({ message: "Cannot join trip as another user." });
     }
 
     try {
@@ -144,8 +144,72 @@ const requestJoin = async (req, res) => {
         return res.status(201).json(trip);
     }
     catch (error) {
-        return res.status(500).json({message: "Error requesting to join trip."});
+        return res.status(500).json({ message: "Error requesting to join trip." });
     }
 };
 
-module.exports = { getTrips, createTrip, deleteTrip, requestJoin };
+const acceptRequest = async (req, res) => {
+    const { driver, departure_date, requester } = req.body;
+
+    if (!driver || !departure_date || !requester) {
+        return res.status(400).json({ message: "Driver, departure date, and the requester are required." });
+    }
+
+    if (driver != req.username) {
+        return res.status(401).json({ message: "Cannot accept trip as another user." });
+    }
+
+    try {
+        const trip = await Trip.findOne({
+            driver: driver,
+            departure_date: departure_date
+        }).exec();
+        if (!trip) {
+            return res.status(404).json({ message: 'Trip not found.' });
+        }
+        if (!trip.requests.includes(requester)) {
+            return res.status(404).json({ message: 'No matching requester.' })
+        }
+        trip.requests = trip.requests.filter(request => request !== requester);
+        trip.passengers.push(requester);
+        await trip.save();
+        return res.status(200).json(trip);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error accepting trip request." });
+    }
+};
+
+const rejectRequest = async (req, res) => {
+    const { driver, departure_date, requester } = req.body;
+
+    if (!driver || !departure_date || !requester) {
+        return res.status(400).json({ message: "Driver, departure date, and the requester are required." });
+    }
+
+    if (driver != req.username) {
+        return res.status(401).json({ message: "Cannot accept trip as another user." });
+    }
+
+    try {
+        const trip = await Trip.findOne({
+            driver: driver,
+            departure_date: departure_date
+        }).exec();
+        if (!trip) {
+            return res.status(404).json({ message: 'Trip not found.' });
+        }
+        if (!trip.requests.includes(requester)) {
+            return res.status(404).json({ message: 'No matching requester.' })
+        }
+        trip.requests = trip.requests.filter(request => request !== requester);
+        await trip.save();
+        return res.status(200).json(trip);
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error rejecting trip request." });
+    }
+};
+
+module.exports = { getTrips, createTrip, deleteTrip, requestJoin, acceptRequest, rejectRequest };
