@@ -7,7 +7,7 @@ import useAuth from '../../hooks/useAuth';
 import CreateTrip from './CreateTrip';
 import TripInfo from './TripInfo';
 
-const Rides = ({ route, isRidesVisible, toggleRides }) => {
+const Rides = ({ route, isRidesVisible, openRides, closeRides }) => {
     const [trips, setTrips] = useState([]);
 
     const [smallScreen, setSmallScreen] = useState(false);
@@ -56,11 +56,11 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
         }
     }, []);
 
-    useEffect(() => {
-        toggleRides();
-    }, [createTripOpen, joinTripOpen]);
+    const toggleRides = () => {
+        isRidesVisible ? closeRides() : openRides();
+    };
 
-    const handleDisplayJoin = (trip) => {
+    const handleOpenDisplayJoin = (trip) => {
         if (!auth?.username) {
             navigate('/login', { state: { from: location } });
             return;
@@ -68,11 +68,13 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
 
         setOpenTrip(trip);
         setJoinTripOpen(true);
+        closeRides();
     };
 
     const handleCloseDisplayJoin = () => {
         setOpenTrip({});
         setJoinTripOpen(false);
+        openRides();
         setTripInfoErr(false);
         setTripInfoErrMsg('');
     };
@@ -84,6 +86,12 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
         }
 
         setCreateTripOpen(true);
+        closeRides();
+    };
+
+    const handleCloseDisplayCreate = () => {
+        setCreateTripOpen(false);
+        openRides();
     };
 
     const handleTripRequest = async () => {
@@ -144,7 +152,7 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
             </div>
             <button
                 className='text-sm mx-auto py-1 px-4 rounded-3xl bg-green-500 hover:scale-95'
-                onClick={() => handleDisplayJoin(trip)}
+                onClick={() => handleOpenDisplayJoin(trip)}
             >
                 Join
             </button>
@@ -229,7 +237,7 @@ const Rides = ({ route, isRidesVisible, toggleRides }) => {
             {createTripOpen && (
                 <CreateTrip
                     route={route}
-                    setCreateTripOpenFalse={() => setCreateTripOpen(false)}
+                    setCreateTripOpenFalse={handleCloseDisplayCreate}
                 />
             )}
 
