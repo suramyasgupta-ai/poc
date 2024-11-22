@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 
-const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
+const Sidebar = ({ sidebarOpen, openSidebar, closeSidebar }) => {
     const isScrolling = useRef(false);
     const [currentSlide, setCurrentSlide] = useState('Created Rides');
     const [searchBar, setSearchBar] = useState('');
@@ -31,14 +31,18 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
         setCurrentSlide(slide);
     };
 
+    const toggleSidebar = () => {
+        sidebarOpen ? closeSidebar() : openSidebar();
+    }
+
     const handleOpenCreatedDisplay = (trip) => {
-        toggleSidebar();
+        closeSidebar();
         setCreatedRide(trip);
         setCreatedRideViewOpen(true);
     };
 
     const handleCloseCreatedDisplay = () => {
-        toggleSidebar();
+        openSidebar();
         setCreatedRide({});
         setCreatedRideViewOpen(false);
         setTripInfoErr(false);
@@ -46,13 +50,13 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
     }
 
     const handleOpenJoinedDisplay = (trip) => {
-        toggleSidebar();
+        closeSidebar();
         setJoinedRide(trip);
         setJoinedRideViewOpen(true);
     };
 
     const handleCloseJoinedDisplay = () => {
-        toggleSidebar();
+        openSidebar();
         setJoinedRide({});
         setJoinedRideViewOpen(false);
         setTripInfoErr(false);

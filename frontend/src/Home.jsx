@@ -38,18 +38,26 @@ const Home = () => {
         }, 700);
     };
 
-    const toggleRides = () => {
+    const openRides = () => {
         if (window.innerWidth < 768 && sidebarOpen) {
-            toggleSidebar();
+            closeSidebar();
         }
-        setIsRidesVisible(prev => !prev);
+        setIsRidesVisible(true);
     };
 
-    const toggleSidebar = () => {
+    const closeRides = () => {
+        setIsRidesVisible(false);
+    };
+
+    const openSidebar = () => {
         if (window.innerWidth < 768 && isRidesVisible) {
-            toggleRides();
+            closeRides();
         }
-        setSidebarOpen(prev => !prev);
+        setSidebarOpen(true);
+    };
+
+    const closeSidebar = () => {
+        setSidebarOpen(false);
     };
 
     return (
@@ -60,13 +68,15 @@ const Home = () => {
             />
             <Sidebar 
                 sidebarOpen={sidebarOpen}
-                toggleSidebar={toggleSidebar}
+                openSidebar={openSidebar}
+                closeSidebar={closeSidebar}
             />
             {routeSearched && (
                 <Rides 
                     route={route}
                     isRidesVisible={isRidesVisible}
-                    toggleRides={toggleRides}
+                    openRides={openRides}
+                    closeRides={closeRides}
                 />
             )}
         </section>
