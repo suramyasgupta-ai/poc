@@ -66,7 +66,6 @@ const CreateTrip = ({ route, setCreateTripOpenFalse }) => {
                 departure_date: departure_date,
                 seats_available: availableSeats
             });
-            const newTrip = response.data;
             setSuccess(true);
         }
         catch (error) {
