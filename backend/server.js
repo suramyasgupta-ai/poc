@@ -36,12 +36,13 @@ app.use('/auth/logout', require('./routes/auth/logout'));
 
 // Public Routes
 app.use('/api/routes', require('./routes/api/routes'));
+app.use('/api/getUser', require('./routes/api/getUser'));
 
 // Verify JWT for all routes below this line (private routes)
 app.use(verifyJWT);
 
-app.use('/api/users', require('./routes/api/users'));
 app.use('/api/trips', require('./routes/api/trips'));
+app.use('/api/users', require('./routes/api/users'));
 
 // Error handling middleware
 app.use(errorHandler);

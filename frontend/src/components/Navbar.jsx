@@ -43,7 +43,7 @@ const Navbar = () => {
                 >
                     <h1 className={`${currentPage === 'Login' && 'font-bold'}`}>Login</h1>
                 </Link> :
-                <Link to='/' className='ml-auto'>
+                <Link to={`/profile/${auth.username}`} className='ml-auto'>
                     <FontAwesomeIcon
                         icon={faUser}
                         color="white"

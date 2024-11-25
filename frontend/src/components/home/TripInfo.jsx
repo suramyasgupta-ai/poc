@@ -1,9 +1,12 @@
 import { useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const TripInfo = ({ openTrip, handleCloseDisplayJoin, tripInfoErr, tripInfoErrMsg, children }) => {
     const isScrolling = useRef(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const handleHorizontalScroll = (e) => {
         const container = e.currentTarget;
@@ -23,6 +26,7 @@ const TripInfo = ({ openTrip, handleCloseDisplayJoin, tripInfoErr, tripInfoErrMs
             <button
                 key={index}
                 className="text-sm py-1 px-4 rounded-3xl bg-gray-500 text-nowrap hover:scale-95"
+                onClick={() => navigate(`/profile/${passenger}`, { state: location })}
             >
                 {passenger}
             </button>

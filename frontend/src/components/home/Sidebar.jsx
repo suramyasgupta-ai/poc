@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import SidebarNav from "./SidebarNav";
 import CreatedRides from "./CreatedRides";
 import JoinedRides from "./JoinedRides";
@@ -26,6 +27,9 @@ const Sidebar = ({ sidebarOpen, openSidebar, closeSidebar }) => {
 
     const axiosPrivate = useAxiosPrivate();
     const { auth } = useAuth();
+
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const handleSlideChange = (slide) => {
         setCurrentSlide(slide);
@@ -115,7 +119,7 @@ const Sidebar = ({ sidebarOpen, openSidebar, closeSidebar }) => {
 
     const handleAcceptRequest = async (passenger) => {
         try {
-            const response  = await axiosPrivate.post('/api/trips/acceptRequest', {
+            const response  = await axiosPrivate.patch('/api/trips/acceptRequest', {
                 driver: auth?.username,
                 departure_date: createdRide.departure_date,
                 requester: passenger
@@ -148,7 +152,7 @@ const Sidebar = ({ sidebarOpen, openSidebar, closeSidebar }) => {
 
     const handleRejectRequest = async (passenger) => {
         try {
-            const response  = await axiosPrivate.post('/api/trips/rejectRequest', {
+            const response  = await axiosPrivate.patch('/api/trips/rejectRequest', {
                 driver: auth?.username,
                 departure_date: createdRide.departure_date,
                 requester: passenger
@@ -179,6 +183,34 @@ const Sidebar = ({ sidebarOpen, openSidebar, closeSidebar }) => {
         }
     };
 
+    const handleLeaveTrip = async () => {
+        try {
+            const response  = await axiosPrivate.patch('/api/trips/leaveTrip', {
+                driver: joinedRide.driver,
+                departure_date: joinedRide.departure_date,
+                requester: auth?.username
+            });
+            setJoinedRides(prevJoinedRides => 
+                prevJoinedRides.filter(ride => 
+                    ride.driver !== joinedRide.driver && ride.departure_date !== joinedRide.departure_date
+                )
+            );
+            handleCloseJoinedDisplay();
+        }
+        catch (error) {
+            if (!error?.response) {
+                setTripInfoErrMsg('Server is down. Please try again later.');
+            }
+            else if (error.response?.status === 404) {
+                setTripInfoErrMsg('Trip or passenger not found.');
+            }
+            else {
+                setTripInfoErrMsg('Failed to leave trip.')
+            }
+            setTripInfoErr(true);
+        }
+    };
+
     const requestElements = createdRide?.requests?.length > 0 ? (
         createdRide.requests.map((passenger, index) => (
             <div
@@ -198,6 +230,7 @@ const Sidebar = ({ sidebarOpen, openSidebar, closeSidebar }) => {
 
                 <button
                     className='text-sm p-1 bg-gray-500 text-nowrap hover:scale-95'
+                    onClick={() => navigate(`/profile/${passenger}`, { state: location })}
                 >
                     {passenger}
                 </button>
@@ -286,9 +319,12 @@ const Sidebar = ({ sidebarOpen, openSidebar, closeSidebar }) => {
                 <TripInfo
                     openTrip={joinedRide}
                     handleCloseDisplayJoin={handleCloseJoinedDisplay}
+                    tripInfoErr={tripInfoErr}
+                    tripInfoErrMsg={tripInfoErrMsg}
                 >
                     <button
                         className='text-sm py-1 px-4 rounded-3xl bg-red-500 hover:scale-95'
+                        onClick={handleLeaveTrip}
                     >
                         Leave
                     </button>
