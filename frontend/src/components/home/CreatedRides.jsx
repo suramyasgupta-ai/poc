@@ -1,10 +1,17 @@
 import { useEffect } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useAuth from '../../hooks/useAuth';
 
 const CreatedRides = ({ searchBar, createdRides, initCreatedRides, handleOpenDisplay }) => {
     const axiosPrivate = useAxiosPrivate();
+    const { auth } = useAuth();
 
     useEffect(() => {
+        if (!auth?.username) {
+            initCreatedRides([]);
+            return;
+        }
+
         const fetchCreatedRides = async () => {
             try {
                 const response = await axiosPrivate.get('/api/trips', {

@@ -1,2 +1,0 @@
-2. Create and join trip buttons should link to login page if not already logged in
-3. Issue with running miniturized code without NODE_ENV=production. Problem with mapbox-gl-directions.

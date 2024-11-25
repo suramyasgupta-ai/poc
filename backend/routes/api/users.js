@@ -3,7 +3,7 @@ const router = express.Router();
 const usersController = require('../../controllers/api/usersController');
 
 router.route('/')
-    .get(usersController.getAllUsers);
+    .patch(usersController.updateUser);
     
 
 module.exports = router;

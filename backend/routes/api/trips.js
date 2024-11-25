@@ -8,12 +8,15 @@ router.route('/')
     .delete(tripsController.deleteTrip);
 
 router.route('/requestJoin')
-    .post(tripsController.requestJoin);
+    .patch(tripsController.requestJoin);
 
 router.route('/acceptRequest')
-    .post(tripsController.acceptRequest);
+    .patch(tripsController.acceptRequest);
 
 router.route('/rejectRequest')
-    .post(tripsController.rejectRequest);
+    .patch(tripsController.rejectRequest);
+
+router.route('/leaveTrip')
+    .patch(tripsController.leaveTrip);
 
 module.exports = router;

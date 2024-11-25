@@ -62,7 +62,7 @@ const Login = () => {
     };
 
     return (
-        <section className='flex flex-col items-center justify-center h-[calc(100vh-48px)] bg-[url(login_img.jpg)] xl:bg-[url(xl_login_img.jpg)] bg-cover bg-center'>
+        <section className='flex flex-col items-center justify-center h-[calc(100vh-48px)] bg-[url("/profile_background.png")]'>
             <form onSubmit={handleSubmit} className='flex flex-col w-full max-w-sm p-5 rounded-md bg-black bg-opacity-40 text-white'>
                 {err && (
                     <p className='bg-red-500 rounded-md p-3 mb-5'>

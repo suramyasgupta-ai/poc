@@ -40,7 +40,7 @@ const Rides = ({ route, isRidesVisible, openRides, closeRides }) => {
             }
         };
 
-        fetchRoutes();
+        fetchRoutes()
     }, [route]);
 
     useEffect(() => {
@@ -101,7 +101,7 @@ const Rides = ({ route, isRidesVisible, openRides, closeRides }) => {
         }
 
         try {
-            const response = await axiosPrivate.post('/api/trips/requestJoin', {
+            const response = await axiosPrivate.patch('/api/trips/requestJoin', {
                 driver: openTrip.driver,
                 departure_date: openTrip.departure_date,
                 requester: auth?.username

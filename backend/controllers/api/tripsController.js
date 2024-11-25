@@ -108,6 +108,38 @@ const deleteTrip = async (req, res) => {
     }
 };
 
+const leaveTrip = async (req, res) => {
+    const { driver, departure_date, requester } = req.body;
+
+    if (!driver || !departure_date || !requester) {
+        return res.status(400).json({ message: "Driver, departure date, and requester are required." });
+    }
+
+    if (requester != req.username) {
+        return res.status(401).json({ message: "Cannot leave a trip as another user." });
+    }
+
+    try {
+        const trip = await Trip.findOne({
+            driver: driver,
+            departure_date: departure_date
+        }).exec();
+        if (!trip) {
+            return res.status(404).json({ message: 'Trip not found.' });
+        }
+        if (!trip.passengers.includes(requester)){
+            return res.status(404).json({ message: 'Passenger not found.' });
+        }
+        trip.passengers = trip.passengers.filter(passenger => passenger !== requester);
+        await trip.save()
+        return res.status(200).json(trip);
+    }
+    catch (error) {
+        return res.status(500).json({ message: "An error occurred while trying to leave the trip." });
+    }
+};
+
+
 const requestJoin = async (req, res) => {
     const { driver, departure_date, requester } = req.body;
 
@@ -125,19 +157,13 @@ const requestJoin = async (req, res) => {
             departure_date: departure_date
         }).exec();
         if (!trip) {
-            return res.status(404).json({
-                message: 'Trip not found.'
-            });
+            return res.status(404).json({ message: 'Trip not found.' });
         }
         if (trip.requests.find(request => request === requester)) {
-            return res.status(409).json({
-                message: 'Already requested.'
-            });
+            return res.status(409).json({ message: 'Already requested.' });
         }
         if (trip.passengers.find(passenger => passenger === requester)) {
-            return res.status(409).json({
-                message: 'Already joined.'
-            });
+            return res.status(409).json({ message: 'Already joined.' });
         }
         trip.requests.push(requester);
         await trip.save();
@@ -212,4 +238,4 @@ const rejectRequest = async (req, res) => {
     }
 };
 
-module.exports = { getTrips, createTrip, deleteTrip, requestJoin, acceptRequest, rejectRequest };
+module.exports = { getTrips, createTrip, deleteTrip, leaveTrip, requestJoin, acceptRequest, rejectRequest };

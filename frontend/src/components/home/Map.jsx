@@ -31,11 +31,11 @@ const Map = ({ displayRides, hideRides }) => {
         });
 
         mapRef.current.on('move', () => {
-            const mapCenter = mapRef.current.getCenter()
-            const mapZoom = mapRef.current.getZoom()
+            const mapCenter = mapRef.current.getCenter();
+            const mapZoom = mapRef.current.getZoom();
       
-            setCenter([ mapCenter.lng, mapCenter.lat ])
-            setZoom(mapZoom)
+            setCenter([ mapCenter.lng, mapCenter.lat ]);
+            setZoom(mapZoom);
         });
 
         const geolocateControl = new mapboxgl.GeolocateControl({
@@ -72,20 +72,18 @@ const Map = ({ displayRides, hideRides }) => {
         mapRef.current.addControl(directionsRef.current, 'top');
 
         directionsRef.current.on('route', () => {
+            const handleButtonClick = (e) => {
+                e.stopPropagation();
+                hideRides();
+            };
+        
             const addButtonClickListener = () => {
-                const directionsButton = directionsRef.current.container.querySelectorAll('.geocoder-icon.geocoder-icon-close');
-
-                const handleButtonClick = (e) => {
-                    e.stopPropagation();
-                    hideRides();
-                };
-    
-                if (directionsButton) {
-                    directionsButton.forEach(button => {
-                        button.removeEventListener('click', handleButtonClick);
-                        button.addEventListener('click', handleButtonClick);
-                    });
-                }
+                const directionsButtons = directionsRef.current.container.querySelectorAll('.geocoder-icon.geocoder-icon-close');
+        
+                directionsButtons.forEach((button) => {
+                    button.removeEventListener('click', handleButtonClick);
+                    button.addEventListener('click', handleButtonClick);
+                });
             };
 
             const origin = directionsRef.current.container.querySelector('#mapbox-directions-origin-input .mapboxgl-ctrl-geocoder input').value;
