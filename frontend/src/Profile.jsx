@@ -23,6 +23,7 @@ const Profile = () => {
     const [passwordOpen, setPasswordOpen] = useState(false);
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [preview, setPreview] = useState(null);
 
     const [userFocus, setUserFocus] = useState(false);
     const [validName, setValidName] = useState(false);
@@ -101,13 +102,38 @@ const Profile = () => {
         setSuccess(false);
     }, [user, oldPassword, newPassword]);
 
-    const handleFormChange = (e) => {
-        const { name, value } = e.target;
+    useEffect(() => {
+        return () => {
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+        };
+    }, [preview]);
 
-        setUser(prevUser => ({
-            ...prevUser,
-            [name]: value
-        }));
+    const handleFormChange = (e) => {
+        const { name, value, type, files } = e.target;
+    
+        if (type === "file" && files.length > 0) {
+            const file = files[0];
+    
+            if (file.type.startsWith("image/")) {
+                const previewUrl = URL.createObjectURL(file);
+                setUser((prevUser) => ({
+                    ...prevUser,
+                    [name]: file, 
+                }));
+                setPreview(previewUrl); 
+            } else {
+                setUpdateErrMsg('Selected file must be an image.');
+                setUpdateErr(true);
+            }
+        } 
+        else {
+            setUser((prevUser) => ({
+                ...prevUser,
+                [name]: value,
+            }));
+        }
     };
 
     const handleProfileUpdate = async (e) => {
@@ -127,15 +153,22 @@ const Profile = () => {
         }
 
         try {
-            const response = await axiosPrivate.patch('/api/users', {
-                ...user,
-                ...(passwordOpen && { old_password: oldPassword, new_password: newPassword })
-            });
+            const formData = new FormData();
+            for (const [key, value] of Object.entries(user)) {
+                formData.append(key, value);
+            }
+            if (passwordOpen) {
+                formData.append('old_password', oldPassword);
+                formData.append('new_password', newPassword);
+            }
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            const response = await axiosPrivate.patch('/api/users', formData);
             setSuccess(true);
             setAuth({ username: user?.username, accessToken: response.data });
         }
         catch (error) {
-            console.log(error);
             if (!error?.response) {
                 setUpdateErrMsg('Network error. No server response.');
             }
@@ -163,7 +196,7 @@ const Profile = () => {
                 </div>
             ) : (
                 <form
-                    className="flex flex-col items-center max-w-8xl bg-black bg-opacity-40 text-white px-4 py-4"
+                    className="flex flex-col items-center w-full max-w-8xl bg-black bg-opacity-40 text-white px-4 py-4"
                     onSubmit={handleProfileUpdate}
                 >
                     {updateErr && (
@@ -181,13 +214,18 @@ const Profile = () => {
                             <input
                                 type="file"
                                 className="w-52"
-                                id="profile_img"
-                                name="profile_img"
-                                onChange={() => console.log('changing')}
+                                id="profile_picture"
+                                name="profile_picture"
+                                accept="image/*"
+                                onChange={handleFormChange}
                             >
                             </input>
                         )}
-                        <img src={user?.profile_picture || '/default_profile_picture.png'} alt="Profile picture." className="mt-2" />
+                        <img 
+                            src={preview || user?.profile_picture || '/default_profile_picture.png'} 
+                            alt="Profile picture." 
+                            className="mt-2 rounded-full w-64 h-64 object-cover" 
+                        />
                     </div>
                     <div className="flex flex-col mt-2 lg:mt-0 w-full lg:w-1/2">
                         <label htmlFor="username" className="font-bold text-gray-400 mt-1">Username:</label>

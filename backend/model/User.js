@@ -14,6 +14,7 @@ const userSchema = new Schema({
     last_name: String,
     email: String,
     phone: String,
+    profile_picture: String,
     refreshToken: String
 });
 

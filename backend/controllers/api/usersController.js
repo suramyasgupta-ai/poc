@@ -1,7 +1,7 @@
 const User = require('../../model/User');
 const bcrypt = require('bcrypt');
-
 const jwt = require('jsonwebtoken');
+const { putImage, deleteImage } = require('../../middleware/s3');
 
 const updateUser = async (req, res) => {
     const { 
@@ -42,6 +42,14 @@ const updateUser = async (req, res) => {
         if (user.phone !== phone) {
             user.phone = phone
         }
+        if (req.file) {
+            if (user.profile_picture) {
+                await deleteImage(user.profile_picture);
+                user.profile_picture = '';
+            }
+            const imageName = await putImage(req.file);
+            user.profile_picture = imageName;
+        }
         if (old_password && new_password) {
             const match = await bcrypt.compare(old_password, user.password);
             if (!match) {
@@ -58,6 +66,7 @@ const updateUser = async (req, res) => {
         return res.status(200).json(accessToken);
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json( {message: "Failed to update user." })
     }
 };
