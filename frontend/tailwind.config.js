@@ -8,15 +8,9 @@ export default {
     extend: {
       colors: {
         base: '#333333ea',
-        primary: '#801336',
-        secondary: '#C72C41',
-        accent: '#EE4540',
       },
       fontFamily: {
         openSans: ['Open Sans', 'sans-serif'],
-      },
-      maxHeight: {
-        '3xl': '48rem',
       },
       maxWidth: {
         '8xl': '90rem',
