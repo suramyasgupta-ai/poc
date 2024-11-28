@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useAuth from "./hooks/useAuth";
@@ -16,6 +16,9 @@ const Profile = () => {
     const { username } = useParams();
     const { auth, setAuth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
+    
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const [user, setUser] = useState();
     const [isAuthUser, setIsAuthUser] = useState(false);
@@ -188,6 +191,18 @@ const Profile = () => {
         }
     };
 
+    const handleLogout = () => {
+        try {
+            const response = axiosPrivate.get('/auth/logout');
+            setAuth({});
+            navigate('/', { state: { from: location } });
+        }
+        catch (error) {
+            setUpdateErrMsg('Failed to logout.');
+            setUpdateErr(true);
+        }
+    };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-48px)] bg-[url('/profile_background.png')]">
             {err ? (
@@ -208,6 +223,15 @@ const Profile = () => {
                         <div className='bg-green-500 rounded-md p-3 mb-5'>
                             Profile updated successfully.
                         </div>
+                    )}
+                    {isAuthUser && (
+                        <button 
+                            type="button"
+                            className="font-bold ml-auto underline"
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </button>
                     )}
                     <div className="flex flex-col items-center mx-auto md:w-2/3 xl:w-2/5">
                         {isAuthUser && (

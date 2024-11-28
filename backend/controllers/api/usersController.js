@@ -11,7 +11,7 @@ const updateUser = async (req, res) => {
         email, 
         phone, 
         old_password, 
-        new_password 
+        new_password
     } = req.body;
 
     try {
