@@ -137,6 +137,7 @@ const Rides = ({ route, isRidesVisible, openRides, closeRides }) => {
         const destination = route.destination.toLowerCase();
         return (
             trip.driver !== auth?.username &&
+            trip.passengers.length < trip.seats_available &&
             (trip.origin.toLowerCase().includes(origin) ||
                 trip.destination.toLowerCase().includes(destination))
         );
