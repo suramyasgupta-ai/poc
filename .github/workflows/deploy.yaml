@@ -12,9 +12,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Login to docker hub
-          run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build docker images
-          run: docker compose up backend-prod frontend-prod
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push frontend and backend images
         run: |
           docker compose build backend-prod frontend-prod
