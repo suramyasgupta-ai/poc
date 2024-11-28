@@ -1,0 +1,37 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Login to docker hub
+          run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build docker images
+          run: docker compose up backend-prod frontend-prod
+      - name: Build and push frontend and backend images
+        run: |
+          docker compose build backend-prod frontend-prod
+          docker tag backend-prod jschur/rideshare-backend:latest
+          docker tag frontend-prod jschur/rideshare-frontend:latest
+          docker push jschur/rideshare-backend:latest
+          docker push jschur/rideshare-frontend:latest
+  
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull docker images
+        run: |
+          docker pull jschur/rideshare-backend:latest
+          docker pull jschur/rideshare-frontend:latest
+      - name: Remove old containers
+        run: docker compose down
+      - name: Run docker compose up
+        run: docker compose up -d
