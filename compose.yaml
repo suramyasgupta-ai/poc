@@ -11,7 +11,7 @@ services:
     ports:
       - "${API_PORT}:8080"
     env_file:
-      - ./backend/.env.development
+      - ./backend/.env
 
   frontend-dev:
     build: 
@@ -24,7 +24,7 @@ services:
     ports:
       - "${WEB_PORT}:5173"
     env_file:
-      - ./frontend/.env.development
+      - ./frontend/.env
     depends_on:
       - backend-dev
     
@@ -33,17 +33,17 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
     ports:
-      - "${API_PORT}:8080"
+      - "${{secrets.API_PORT}}:3000"
     env_file:
-      - ./backend/.env.production
+      - ./backend/.env
   
   frontend-prod:
     build: 
       context: ./frontend
       dockerfile: Dockerfile.prod
     ports:
-      - "${WEB_PORT}:80"
+      - "${{secrets.WEB_PORT}}:80"
     env_file:
-      - ./frontend/.env.production
+      - ./frontend/.env
     depends_on:
       - backend-prod
