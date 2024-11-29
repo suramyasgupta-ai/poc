@@ -40,8 +40,8 @@ jobs:
       - name: Build and push frontend and backend images
         run: |
           docker compose build backend-prod frontend-prod
-          docker tag backend-prod jschur/rideshare-backend:latest
-          docker tag frontend-prod jschur/rideshare-frontend:latest
+          docker tag rideshare-backend-prod jschur/rideshare-backend:latest
+          docker tag rideshare-frontend-prod jschur/rideshare-frontend:latest
           docker push jschur/rideshare-backend:latest
           docker push jschur/rideshare-frontend:latest
   
