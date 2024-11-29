@@ -55,7 +55,7 @@ jobs:
           docker pull jschur/rideshare-frontend:latest
 
       - name: Remove old containers
-        run: docker-compose down
+        run: docker compose down
 
-      - name: Run docker-compose up
-        run: docker-compose up -d
+      - name: Run docker compose up
+        run: docker compose up -d
