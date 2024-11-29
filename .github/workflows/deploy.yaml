@@ -24,13 +24,13 @@ jobs:
         run: |
           echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}" >> backend/.env
           echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> backend/.env
-          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> .env
-          echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> .env
-          echo "BUCKET_REGION=${{ secrets.BUCKET_REGION }}" >> .env
-          echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> .env
-          echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
-          echo "API_PORT=${{ secrets.API_PORT }}" >> .env
-          echo "WEB_URL=${{ secrets.WEB_URL }}" >> .env
+          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> backend/.env
+          echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> backend/.env
+          echo "BUCKET_REGION=${{ secrets.BUCKET_REGION }}" >> backend/.env
+          echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> backend/.env
+          echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> backend/.env
+          echo "API_PORT=${{ secrets.API_PORT }}" >> backend/.env
+          echo "WEB_URL=${{ secrets.WEB_URL }}" >> backend/.env
       
       - name: Create frontend .env file from secrets
         run: |
