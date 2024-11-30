@@ -22,3 +22,11 @@ A rideshare web application built with the MERN stack (MongoDB, Express.js, Reac
   - MongoDB for storing user data, trip details, and chat messages.
 - **Maps and Routes:**
   - Mapbox API for maps and route visualizations.
+
+## Deployment
+- **CI/CD:**
+  - The app is deployed using GitHub Actions, which automatically builds and pushes backend and frontend Docker images to Docker Hub.
+- **AWS EC2 & Load Balancer:**
+  - A GitHub Actions runner deploys the app by pulling the images to an AWS EC2 instance. The EC2 instance sits behind an Elastic Load Balancer (ELB) with an SSL certificate applied to ensure secure HTTPS traffic.
+- **Cloudflare:**
+  - The Elastic Load Balancer is further secured and optimized by Cloudflare, providing additional caching, DDoS protection, and performance enhancements.
