@@ -49,6 +49,9 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
+      - name: Prune unused Docker resources
+        run: docker system prune -af --volumes
+        
       - name: Pull docker images
         run: |
           docker pull jschur/rideshare-backend:latest
