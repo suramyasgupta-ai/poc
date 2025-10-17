@@ -1,3 +1,4 @@
+require("./instrumentation");
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -12,6 +13,19 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/dbConn');
 const PORT = process.env.API_PORT;
 
+console.log('API_PORT:', process.env.API_PORT); // Should print 
+
+const bunyan = require('bunyan');
+const log = bunyan.createLogger({ name: 'ride-share-app' });
+
+
+
+app.use((req, res, next) => {
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
+    next();
+})
 // Connect to the database
 connectDB();
 
@@ -51,6 +65,11 @@ app.use(errorHandler);
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');
     app.listen(PORT, () => {
+            
+
+    log.info('Application started');
+    // log.warn({ type: 'warning' }, 'Something might be wrong');
+    // log.error('An error occurred');
         console.log(`Server is running on port ${PORT}`);
     });
 });
