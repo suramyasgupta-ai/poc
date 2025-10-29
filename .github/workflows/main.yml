@@ -25,6 +25,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
+      # 🌟 NEW: Datadog CI Visibility Setup 🌟
+      # This step instruments the runner to send CI metrics (duration, status) to Datadog.
+      # Requires DD_API_KEY and DD_SITE to be set as GitHub Secrets.
+      - name: Datadog CI Visibility Setup
+        uses: DataDog/github-action@v1
+        with:
+          # Replace 'poc-data-pipeline' with your chosen service name
+          service: 'poc-data-pipeline' 
+          # These secrets must be created in your repository settings
+          api_key: ${{ secrets.DD_API_KEY }}
+          site: ${{ secrets.DD_SITE }}
+
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
