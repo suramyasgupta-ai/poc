@@ -31,7 +31,7 @@ jobs:
       # 1. Datadog CI Visibility Setup
       # This action installs the dd-tracer CLI and sets up the environment.
       - name: Datadog CI Visibility Setup
-        uses: DataDog/github-action@v1
+        uses: datadog/github-action@v1
         with:
           # Use your Datadog secrets for API key and site
           api_key: ${{ secrets.DD_API_KEY }}
