@@ -1,48 +1,93 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
+name: CI/CD and Datadog DORA Metrics
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# Define environment variables for Datadog tracing
+env:
+  # This service name tracks the overall CI/CD pipeline in Datadog
+  DD_SERVICE: 'rideshare-app-ci'
+  DD_ENV: 'main'
+
 jobs:
-  # This workflow contains a single job called "build"
+  # The 'build' job handles linting, testing, and building the artifact.
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # 🌟 NEW: Datadog CI Visibility Setup 🌟
-      # This step instruments the runner to send CI metrics (duration, status) to Datadog.
-      # Requires DD_API_KEY and DD_SITE to be set as GitHub Secrets.
+      - name: Set up Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 1. Datadog CI Visibility Setup
+      # This action installs the dd-tracer CLI and sets up the environment.
       - name: Datadog CI Visibility Setup
         uses: DataDog/github-action@v1
         with:
-          # Replace 'poc-data-pipeline' with your chosen service name
-          service: 'poc-data-pipeline' 
-          # These secrets must be created in your repository settings
+          # Use your Datadog secrets for API key and site
           api_key: ${{ secrets.DD_API_KEY }}
           site: ${{ secrets.DD_SITE }}
+          # Optional: Set a specific name for the build in the Datadog UI
+          build_name: 'Rideshare App CI Build'
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Install dependencies
+        run: npm ci
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      # 2. Run Tests and trace them with dd-tracer
+      # The dd-tracer command ensures test results are sent to Datadog Test Visibility.
+      # This feeds into Lead Time for Change and Change Failure Rate metrics.
+      - name: Run Tests (Traced for DORA)
+        # DD_INSTRUMENTATION_INSTALL=true ensures the tracing library is injected
+        env:
+          DD_INSTRUMENTATION_INSTALL: 'true'
+          # Use a specific service name for the tests to separate them from the pipeline
+          DD_SERVICE: 'rideshare-app-tests'
+        # dd-tracer is automatically available via the Datadog action setup step
+        run: dd-tracer run -- npm test
+
+      # 3. Runs a mock build command
+      - name: Run Project Build
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo "Simulating production build..."
+          # Replace with your actual build command, e.g., npm run build
+
+  # The 'deploy' job is responsible for deploying the artifact.
+  # This is crucial for tracking Deployment Frequency and the final step of Lead Time.
+  deploy:
+    needs: build
+    # Only run the deployment on push to 'main' branch and if the build was successful
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+    # Define the environment for better tracking in GitHub and Datadog
+    environment: production
+
+    steps:
+      - name: Mock Deployment Step
+        run: echo "Deploying Rideshare-app artifact to production..."
+        # Replace this with your actual deployment script (e.g., using AWS CLI, Docker, etc.)
+
+      # 4. Send Datadog Deployment Event (The DORA Trigger)
+      # This explicitly tells Datadog a successful deployment has occurred,
+      # triggering the calculation of Deployment Frequency and Lead Time for Change.
+      - name: Send Datadog Deployment Event
+        uses: DataDog/github-action@v1
+        with:
+          api_key: ${{ secrets.DD_API_KEY }}
+          site: ${{ secrets.DD_SITE }}
+          # The service name being deployed to in production
+          deployment_service: 'rideshare-app-prod'
+          deployment_event: 'true'
+          deployment_environment: 'production'
+          deployment_status: 'success'
+          deployment_commit: ${{ github.sha }}
+          deployment_ref: ${{ github.ref }}
+          # deployment_url: 'https://your-rideshare-prod.com' # Recommended
